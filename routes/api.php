@@ -22,4 +22,4 @@ Route::post('/c2b/v1/validation', [MPESAResponseController::class, 'validation']
 Route::post('/c2b/v1/express', [MPESAResponseController::class, 'express']);
 
 
-Route::post('/transquery/v1/handleCallback', [MPESAResponseController::class, 'transquery']);
+Route::post('/transquery/v1/handleCallback', [MPESAResponseController::class, 'transqueryCallback']);

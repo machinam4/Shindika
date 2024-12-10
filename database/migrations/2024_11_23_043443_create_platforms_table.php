@@ -18,8 +18,8 @@ return new class extends Migration
             $table->integer('mobile_outgoing');
             $table->integer('b2c_wallet');
             $table->integer('paybill_wallet');
-            $table->integer('bet_minimum')->default(40);
-            $table->integer('bet_maximum');
+            $table->integer('wallet_price')->default(90);
+            $table->integer('vote_price')->default(49);
             $table->integer('win_ratio');
             $table->integer('win_maximum');
             $table->integer('win_minimum');

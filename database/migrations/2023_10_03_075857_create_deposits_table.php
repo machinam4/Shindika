@@ -29,7 +29,7 @@ return new class extends Migration
             $table->string("FirstName")->nullable();
             $table->string("MiddleName")->nullable();
             $table->string("LastName")->nullable();
-            $table->string("SmsShortcode")->nullable();
+            $table->string("platform")->nullable();
             $table->timestamps();
         });
     }

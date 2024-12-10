@@ -7,11 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 class Player extends Model
 {
     protected $fillable = [
-        "phone",
-        "player_code",
-        "invite_code",
-        "transaction_id",
+        'phone',
+        'player_code',
+        'invite_code',
+        'transaction_id',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            // Automatically set the player_code before creating a new player
+            $model->player_code = self::generateAccountCode();
+        });
+    }
 
     public function votes()
     {
@@ -25,10 +35,18 @@ class Player extends Model
 
     public static function generateAccountCode()
     {
-        do {
-            $code = strtoupper(substr(md5(uniqid(rand(), true)), 0, 6));
-        } while (self::where('player_code', $code)->exists());
+        $lastCode = self::orderBy('id', 'desc')->value('player_code');
+        $nextCode = $lastCode ? strtoupper(self::incrementCode($lastCode)) : '0000';
 
-        return $code;
+        return $nextCode;
+    }
+
+    public static function incrementCode($code)
+    {
+        $base = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $codeValue = base_convert($code, 36, 10);
+        $codeValue++;
+
+        return strtoupper(base_convert($codeValue, 10, 36));
     }
 }

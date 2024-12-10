@@ -26,12 +26,12 @@ class Deposits extends Model
         'FirstName',
         'MiddleName',
         'LastName',
-        'SmsShortcode',
+        'platform',
     ];
 
     public function player()
     {
-        return $this->hasOne(Player::class, 'BillRefNumber', 'player_code');
+        return $this->hasOne(Player::class, 'player_code', 'normalized_bill_ref');
     }
 
     public function paybill()
@@ -43,4 +43,10 @@ class Deposits extends Model
     // {
     //     return $this->hasOne(Platforms::class, 'id', 'SmsShortcode');
     // }
+
+    // Add an accessor for normalized_bill_ref
+public function getNormalizedBillRefAttribute()
+{
+    return substr($this->BillRefNumber, 2); // Remove the first two characters (e.g., 'VT', 'WT')
+}
 }

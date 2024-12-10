@@ -15,13 +15,12 @@ class Platforms extends Model
         'mobile_outgoing',
         'b2c_wallet',
         'paybill_wallet',
-        'bet_minimum',
-        'bet_maximum',
+        'wallet_price',
+        'vote_price',
         'win_ratio',
         'win_maximum',
         'win_minimum',
     ];
-
 
     public function incoming()
     {
