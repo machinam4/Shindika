@@ -20,14 +20,27 @@ class MPESAResponseController extends Controller
             $deposit->update([
                 'TransactionType' => $request->TransactionType,
                 'BusinessShortCode' => $request->BusinessShortCode,
-                'BillRefNumber' => $request->BillRefNumber,
+                'BillRefNumber' => strtoupper($request->BillRefNumber),
                 'InvoiceNumber' => $request->InvoiceNumber,
                 'OrgAccountBalance' => $request->OrgAccountBalance,
                 'ThirdPartyTransID' => $request->ThirdPartyTransID,
                 'FirstName' => $request->FirstName,
             ]);
-            // add votes
             $player_code = substr($deposit->BillRefNumber, 2);
+            if(substr($deposit->BillRefNumber, 0, 2) == 'WT'){
+                        $player = Player::create([
+                            "phone" => formatPhoneNumber($deposit->MSISDN),
+                            "invite_code" => $player_code,
+                            "transaction_id" => $deposit->TransID
+                        ]);
+
+                        $message = "Congratulations! You have created wallet. Your voting code is VT$player->player_code. Invite your friends to vote for you. You can also invite them to stand a chance too usin code WT$player->player_code. Keep voting to win your prize";
+                        sendSMS($message, $deposit->MSISDN, 1);
+
+                        return "wallet success";
+            }
+            // add votes
+            
             $voting = new VoteController;
             $vote =  $voting->addvote($deposit, $player_code);
             return 'success';
