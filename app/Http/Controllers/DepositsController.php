@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Deposits;
+use Illuminate\Support\Facades\Log;
 
 class DepositsController extends Controller
 {
@@ -12,7 +13,7 @@ class DepositsController extends Controller
         $paybill = $platform->paybill;
 
 
-        // Log::info($platform->paybill);
+        Log::info($platform->paybill);
         // stk push
         $timestamp = now()->setTimezone('UTC')->format('YmdHis');
         $data = [
@@ -29,13 +30,13 @@ class DepositsController extends Controller
             'TransactionDesc' => "WALLET $playercode",
         ];
         // Log::info($data);
-        // Log::info(response()->json($data, 200));
+        Log::info(response()->json($data, 200));
 
         // TO:DO wait for mpesa to finish transaction the send notifi to user
         try {
             $sendStk = new DarajaApiController;
             $response = $sendStk->STKPush($data, $paybill);
-            // Log::info(json_encode($response));
+            Log::info(json_encode($response));
             if (! isset($response->ResponseCode)) {
                 return response()->json('failed', 200);
             }
