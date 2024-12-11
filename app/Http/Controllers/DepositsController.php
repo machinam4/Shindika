@@ -49,7 +49,7 @@ class DepositsController extends Controller
                     'CheckoutRequestID' => $response->CheckoutRequestID,
                     'TransactionType' => 'CustomerPayBillOnline',
                     'BusinessShortCode' => $paybill->shortcode,
-                    'BillRefNumber' => "Box $playercode",
+                    'BillRefNumber' => "$playercode",
                     'MSISDN' => $phoneNumber,
                     'platform' => $platform->id,
                 ];
