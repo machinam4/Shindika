@@ -166,6 +166,13 @@ class SmsController extends Controller
                         return response($sms);
                     case '4':
                         Cache::forget("ussd_session_state_{$sessionId}");
+                        if (!$contact->player) {
+                            $wallet = "WT0000";
+                            $DepositWallet = new DepositsController;
+                            $deposit = $DepositWallet->depositfund($wallet, $mobile, $platform->wallet_price, $platform);
+                            $sms = "END You need a wallet first. To open your Wallet Enter M-Pesa pin on the prompt or send KES $platform->wallet_price to paybill: " . $platform->paybill->shortcode . " account: $wallet";
+                            return response($sms);
+                        }
                         $wallet = $contact->player->player_code;
                         $message = "Hi! I'm in the MAISHA KRISI PROMO, and your vote can help us win BIG! 🏆\n\n" .
                         "👉 Dial *245#, select Option 3, and enter my code: $wallet.\n" .
