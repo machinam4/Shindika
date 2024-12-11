@@ -26,8 +26,8 @@ class DepositsController extends Controller
             'PartyB' => $paybill->shortcode,
             'PhoneNumber' => $phoneNumber,
             'CallBackURL' => url('').'/api/c2b/v1/express',
-            'AccountReference' => "WALLET $playercode",
-            'TransactionDesc' => "WALLET $playercode",
+            'AccountReference' => "$playercode",
+            'TransactionDesc' => "$playercode",
         ];
         // Log::info($data);
         // Log::info(response()->json($data, 200));
