@@ -34,7 +34,7 @@ class MPESAResponseController extends Controller
                             "transaction_id" => $deposit->TransID
                         ]);
 
-                        $message = "Congratulations! You have created wallet. Your voting code is VT$player->player_code. Invite your friends to vote for you. You can also invite them to stand a chance too usin code WT$player->player_code. Keep voting to win your prize";
+                        $message = "Congratulations! You have created wallet. Your voting code is VT$player->player_code. Invite your friends to vote for you. You can also invite them to stand a chance too using code WT$player->player_code. Keep voting to win your prize";
                         sendSMS($message, $deposit->MSISDN, 1);
 
                         return "wallet success";

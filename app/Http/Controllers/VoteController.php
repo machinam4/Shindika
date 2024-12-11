@@ -9,7 +9,7 @@ class VoteController extends Controller
 {
     public function addvote($deposit, $player_code)
     {
-        $voteprice = 49;
+        $voteprice = 40;
 
         $votes = floor($deposit->TransAmount / $voteprice);
         $lastvote = $deposit->player->votes()->latest()->first();
