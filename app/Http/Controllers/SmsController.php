@@ -129,7 +129,7 @@ class SmsController extends Controller
             if (is_null($message) && $sessionState === 'start') {
                 Cache::put("ussd_session_state_{$sessionId}", 'select_option');
 
-                $sms = "CON Sherehekea Krisi na Tuzo Kubwa!\n***\n***\n1. New Wallet\n2. Refferal Wallet\n3. Vote 4. Get Share Text\n***\n *** \n Sherehekea Krisi na style!";
+                $sms = "CON Sherehekea Krisi na Tuzo Kubwa!\n***\n***\n1. New Wallet\n2. Refferal Wallet\n3. Vote \n4. Get Share Text\n***\n *** \n Sherehekea Krisi na style!";
 
                 return response($sms);
 
