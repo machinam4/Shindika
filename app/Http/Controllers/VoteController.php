@@ -12,7 +12,8 @@ class VoteController extends Controller
         $voteprice = 49;
 
         $votes = floor($deposit->TransAmount / $voteprice);
-        $totalvotes = $deposit->player->votes()->latest()->first()->total_votes + $votes;
+        $lastvote = $deposit->player->votes()->latest()->first();
+        $totalvotes = $lastvote ? $lastvote->total_votes + $votes : $votes;
 
         $vote = Vote::Create([
             "transaction_id" => $deposit->TransID,
