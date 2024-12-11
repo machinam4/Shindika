@@ -129,7 +129,7 @@ class SmsController extends Controller
             if (is_null($message) && $sessionState === 'start') {
                 Cache::put("ussd_session_state_{$sessionId}", 'select_option');
 
-                $sms = "CON Sherehekea Krisi na Tuzo Kubwa!\n***\n***\n1. New Wallet\n2. Refferal Wallet\n3. Vote ***\n *** \n Sherehekea Krisi na style!";
+                $sms = "CON Sherehekea Krisi na Tuzo Kubwa!\n***\n***\n1. New Wallet\n2. Refferal Wallet\n3. Vote \n***\n *** \n Sherehekea Krisi na style!";
 
                 return response($sms);
 
@@ -161,7 +161,8 @@ class SmsController extends Controller
                         return response($sms);
 
                     case '3': // vote for player
-                        $sms = "CON Enter the refferer code:";
+                        Cache::put("ussd_session_state_{$sessionId}", 'vote_for_player');
+                        $sms = "CON Enter the player code:";
                         return response($sms);
 
                     default:
