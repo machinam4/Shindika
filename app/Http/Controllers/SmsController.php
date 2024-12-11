@@ -174,11 +174,11 @@ class SmsController extends Controller
                             return response($sms);
                         }
                         $wallet = $contact->player->player_code;
-                        $message = "Hi! I'm in the MAISHA KRISI PROMO, and your vote can help us win BIG! 🏆\n\n" .
-                        "👉 Dial *245#, select Option 3, and enter my code: $wallet.\n" .
-                        "OR\n" .
-                        "💵 Send KES $platform->wallet_price to Paybill: {$platform->paybill->shortcode}, Acc: $wallet.\n\n" .
-                        "Let’s do this together! Share with friends so we can win amazing prizes! 🎉💪";                        
+                        $message = "Hi! I'm in the MAISHA KRISI PROMO, and your vote can help me win BIG!\n\n" .
+                        "Dial *245#, select Option 3, and enter my code: VT$wallet.\n" .
+                        "OR\n".
+                        "Send KES $platform->wallet_price to Paybill: {$platform->paybill->shortcode}, Acc: VT$wallet.\n\n" .
+                        "Lets do this together! Share with friends so we can win amazing prizes!";                        
                         
                         sendSMS($message, $mobile, 1);
                         $sms = "END Your share message has been sent to you";

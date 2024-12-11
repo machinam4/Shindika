@@ -2,6 +2,8 @@
 // bulk.ke sms sending
 
 use App\Models\MobileOutgoing;
+use Illuminate\Support\Facades\Log;
+
 
  function sendSMS($message, $phone, $outgoing)
     {
@@ -57,7 +59,7 @@ use App\Models\MobileOutgoing;
         }
 
         curl_close($curl);
-        // Log::info($response);
+        Log::info($response);
 
         // Return the response
         return $response;
