@@ -141,13 +141,13 @@ class SmsController extends Controller
                         if ($contact->player) {
                             Cache::put("ussd_session_state_{$sessionId}", 'player_exist');
                             $player = $contact->player;
-                            $sms = "CON ou already have account code: refferal at WT$player->player_code vote at VT$player->player_code. Vote \n1. For Self \n2. For Other \n3. Cancel ";
+                            $sms = "CON You already have account code: refferal at WT$player->player_code vote at VT$player->player_code. Vote \n1. For Self \n2. For Other \n3. Cancel ";
                             return response($sms);
                         }
                         $wallet = "WT0000";
                         // send mpesa popup
                         $DepositWallet = new DepositsController;
-                        $deposit = $DepositWallet->depositfund($wallet, $mobile, $platform->wallet_price, $platform);
+                        $deposit = $DepositWallet->depositfund("WT$wallet", $mobile, $platform->wallet_price, $platform);
                         $sms = "END To open your Wallet Enter M-Pesa pin on the prompt or send KES $platform->wallet_price to paybill: " . $platform->paybill->shortcode . " account: $wallet";
                         return response($sms);
 
@@ -155,7 +155,7 @@ class SmsController extends Controller
                         if ($contact->player) {
                             Cache::put("ussd_session_state_{$sessionId}", 'player_exist');
                             $player = $contact->player;
-                            return "You already have account code: $player->player_code. Vote \n1. For Self \n2. For Other \n3. Cancel ";
+                            return "You already have account code: VT$player->player_code. Vote \n1. For Self \n2. For Other \n3. Cancel ";
                         }
                         Cache::put("ussd_session_state_{$sessionId}", 'wallet_refferer');
                         $sms = "CON Enter the refferer code:";
@@ -170,7 +170,7 @@ class SmsController extends Controller
                         if (!$contact->player) {
                             $wallet = "WT0000";
                             $DepositWallet = new DepositsController;
-                            $deposit = $DepositWallet->depositfund($wallet, $mobile, $platform->wallet_price, $platform);
+                            $deposit = $DepositWallet->depositfund("WT$wallet", $mobile, $platform->wallet_price, $platform);
                             $sms = "END You need a wallet first. To open your Wallet Enter M-Pesa pin on the prompt or send KES $platform->wallet_price to paybill: " . $platform->paybill->shortcode . " account: $wallet";
                             return response($sms);
                         }
@@ -197,9 +197,9 @@ class SmsController extends Controller
                         $wallet = $contact->player->player_code;
                         // send mpesa popup
                         $DepositVote = new DepositsController;
-                        $vote = $DepositVote->depositfund($wallet, $mobile, $platform->vote_price, $platform);
+                        $vote = $DepositVote->depositfund("VT$wallet", $mobile, $platform->vote_price, $platform);
 
-                        $sms = "END To vote for $wallet Enter M-Pesa pin on the prompt or send KES $platform->vote_price to paybill: " . $platform->paybill->shortcode . " account: $wallet";
+                        $sms = "END To vote for VT$wallet Enter M-Pesa pin on the prompt or send KES $platform->vote_price to paybill: " . $platform->paybill->shortcode . " account: $wallet";
                         return response($sms);
                     case '2': //vote for friend -- send push to pay for new wallet
                         Cache::put("ussd_session_state_{$sessionId}", 'vote_for_player');
