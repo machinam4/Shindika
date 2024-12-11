@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Platforms;
 use App\Models\Prize;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class SmsController extends Controller
 {
@@ -76,7 +78,7 @@ class SmsController extends Controller
                     return ($index + 1).'. '.$prize->name; // Assuming 'name' is a column in the 'prizes' table
                 })->implode("\n"); // Joins all strings with a newline
                 $sms = "WIN PROMO: \n \n $numberedPrizes";
-                break;
+                return $sms;
 
             default:
                 // send game menu
@@ -84,6 +86,136 @@ class SmsController extends Controller
 
                 return $menu;
             }
+        }
+    }
+
+
+
+    public function ussd(Request $request)
+    {
+        $data = $request->all();
+
+        Log::info($data);
+        $message = strtoupper($data['USSD_STRING']) ?? null;
+        $mobile = $data['MSISDN'];
+        $sessionId = $data['SESSION_ID'];
+        $sms_shortcode = urldecode($data['SERVICE_CODE']);
+        // Log::info($sms_shortcode);
+
+        // $option = strtoupper($message); // Convert to lowercase if needed
+
+        $Contact = new ContactController;
+        $contact = $Contact->store($mobile);
+
+        $platform = Platforms::whereHas('incoming', function ($query) use ($sms_shortcode) {
+            $query->where('shortcode', $sms_shortcode);
+        })->first();
+
+        if ($platform) {//if platform in db
+
+            if ($message) {
+                $inputs = explode('*', urldecode($message));
+                $message = end($inputs); // Safely get the last value
+            } else {
+                $message = null;
+            }
+
+            // Retrieve or initialize the session state
+            $sessionState = Cache::get("ussd_session_state_{$sessionId}", 'start');
+
+            // Log::info('session state: '.$sessionState);
+
+            // Step 1: Welcome message and box selection
+            if (is_null($message) && $sessionState === 'start') {
+                Cache::put("ussd_session_state_{$sessionId}", 'select_option');
+
+                $sms = "CON Sherehekea Krisi na Tuzo Kubwa!\n***\n***\n1. New Wallet\n2. Refferal Wallet\n3. Vote ***\n *** \n Sherehekea Krisi na style!";
+
+                return response($sms);
+
+                // Step 2: Box selection
+            } elseif ($sessionState === 'select_option') {
+                $option = (int) $message;
+                switch ($option) {
+                    case '1': //new wallet -- send push to pay for new wallet
+                        if ($contact->player) {
+                            Cache::put("ussd_session_state_{$sessionId}", 'player_exist');
+                            $player = $contact->player;
+                            return "You already have account code: refferal at WT$player->player_code vote at VT$player->player_code. Vote \n1. For Self \n2. For Other \n3. Cancel ";
+                        }
+                        $wallet = "WT0000";
+                        // send mpesa popup
+                        $DepositWallet = new DepositsController;
+                        $deposit = $DepositWallet->depositfund($wallet, $mobile, $platform->wallet_price, $platform);
+                        $sms = "END To open your Wallet Enter M-Pesa pin on the prompt or send KES $platform->wallet_price to paybill: " . $platform->paybill->shortcode . " account: $wallet";
+                        return response($sms);
+
+                    case '2': //open wallet with refferal code
+                        if ($contact->player) {
+                            Cache::put("ussd_session_state_{$sessionId}", 'player_exist');
+                            $player = $contact->player;
+                            return "You already have account code: $player->player_code. Vote \n1. For Self \n2. For Other \n3. Cancel ";
+                        }
+                        Cache::put("ussd_session_state_{$sessionId}", 'wallet_refferer');
+                        $sms = "CON Enter the refferer code:";
+                        return response($sms);
+
+                    case '3': // vote for player
+                        $sms = "CON Enter the refferer code:";
+                        return response($sms);
+
+                    default:
+                        $sms = "END Invalid Option:";
+                        return response($sms);
+
+                }
+            } elseif ($sessionState === 'player_exist') {
+                $option = (int) $message;
+                switch ($option) {
+                    case '1': //vote for self -- send push to pay for new wallet                        
+                        $wallet = $contact->player->player_code;
+                        // send mpesa popup
+                        $DepositVote = new DepositsController;
+                        $vote = $DepositVote->depositfund($wallet, $mobile, $platform->wallet_price, $platform);
+
+                        $sms = "END To vote for $wallet Enter M-Pesa pin on the prompt or send KES $platform->vote_price to paybill: " . $platform->paybill->shortcode . " account: $wallet";
+                        return response($sms);
+                    case '2': //vote for friend -- send push to pay for new wallet
+                        Cache::put("ussd_session_state_{$sessionId}", 'vote_for_player');
+                        $sms = "CON Enter the Players code:";
+                        return response($sms);
+                    case '3': //Cancel
+                        $sms = "END Thank you for participating you can start over by dialing *245#.";
+                        return response($sms);
+                    default:
+                        $sms = "END Invalid Option:";
+                        return response($sms);
+                }
+            } elseif ($sessionState === 'vote_for_player') {
+                $wallet = $message;
+                // send mpesa popup
+                $DepositVote = new DepositsController;
+                $vote = $DepositVote->depositfund($wallet, $mobile, $platform->wallet_price, $platform);
+
+                $sms = "END vote for $wallet Enter M-Pesa pin on the prompt or send KES $platform->vote_price to paybill: " . $platform->paybill->shortcode . " account: $wallet";
+                return response($sms);
+
+            } elseif ($sessionState === 'wallet_refferer') { //open wallet by refferer code
+                $wallet = $message;
+                        // send mpesa popup
+                        $DepositWallet = new DepositsController;
+                        $deposit = $DepositWallet->depositfund($wallet, $mobile, $platform->wallet_price, $platform);
+                        $sms = "END To open your Wallet Enter M-Pesa pin on the prompt or send KES $platform->wallet_price to paybill: " . $platform->paybill->shortcode . " account: $wallet";
+                        return response($sms);
+            }
+
+            else {//if invalid option
+                $sms = "CON Sherehekea Krisi na Tuzo Kubwa!\n***\n***\n1. New Wallet\n2. Refferal Wallet\n3. Vote ***\n *** \n Sherehekea Krisi na style!";
+
+                return response($sms); // invalid option
+            }
+        }else{
+            return response('END REQUEST FAILED'); //no platform
         }
     }
 

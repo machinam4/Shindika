@@ -14,6 +14,7 @@ Route::get('/user', function (Request $request) {
 Route::apiResource('players', PlayerController::class);
 Route::apiResource('contacts', ContactController::class);
 Route::post('/sms/receive', [SmsController::class, 'receive']);
+Route::post('/ussd/receive', [SmsController::class, 'ussd']);
 
 
 
