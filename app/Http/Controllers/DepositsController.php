@@ -30,7 +30,7 @@ class DepositsController extends Controller
             'TransactionDesc' => "WALLET $playercode",
         ];
         // Log::info($data);
-        Log::info(response()->json($data, 200));
+        // Log::info(response()->json($data, 200));
 
         // TO:DO wait for mpesa to finish transaction the send notifi to user
         try {
