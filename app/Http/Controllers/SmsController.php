@@ -141,7 +141,8 @@ class SmsController extends Controller
                         if ($contact->player) {
                             Cache::put("ussd_session_state_{$sessionId}", 'player_exist');
                             $player = $contact->player;
-                            return "You already have account code: refferal at WT$player->player_code vote at VT$player->player_code. Vote \n1. For Self \n2. For Other \n3. Cancel ";
+                            $sms = "CON ou already have account code: refferal at WT$player->player_code vote at VT$player->player_code. Vote \n1. For Self \n2. For Other \n3. Cancel ";
+                            return response($sms);
                         }
                         $wallet = "WT0000";
                         // send mpesa popup
@@ -196,7 +197,7 @@ class SmsController extends Controller
                         $wallet = $contact->player->player_code;
                         // send mpesa popup
                         $DepositVote = new DepositsController;
-                        $vote = $DepositVote->depositfund($wallet, $mobile, $platform->wallet_price, $platform);
+                        $vote = $DepositVote->depositfund($wallet, $mobile, $platform->vote_price, $platform);
 
                         $sms = "END To vote for $wallet Enter M-Pesa pin on the prompt or send KES $platform->vote_price to paybill: " . $platform->paybill->shortcode . " account: $wallet";
                         return response($sms);
@@ -215,7 +216,7 @@ class SmsController extends Controller
                 $wallet = $message;
                 // send mpesa popup
                 $DepositVote = new DepositsController;
-                $vote = $DepositVote->depositfund($wallet, $mobile, $platform->wallet_price, $platform);
+                $vote = $DepositVote->depositfund($wallet, $mobile, $platform->vote_price, $platform);
 
                 $sms = "END vote for $wallet Enter M-Pesa pin on the prompt or send KES $platform->vote_price to paybill: " . $platform->paybill->shortcode . " account: $wallet";
                 return response($sms);
