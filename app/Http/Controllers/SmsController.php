@@ -129,7 +129,7 @@ class SmsController extends Controller
             if (is_null($message) && $sessionState === 'start') {
                 Cache::put("ussd_session_state_{$sessionId}", 'select_option');
 
-                $sms = "CON Sherehekea Krisi na Tuzo Kubwa!\n***\n***\n1. New Wallet\n2. Refferal Wallet\n3. Vote \n***\n *** \n Sherehekea Krisi na style!";
+                $sms = "CON Sherehekea Krisi na Tuzo Kubwa!\n***\n***\n1. New Wallet\n2. Refferal Wallet\n3. Vote 4. Get Share Text\n***\n *** \n Sherehekea Krisi na style!";
 
                 return response($sms);
 
@@ -163,6 +163,18 @@ class SmsController extends Controller
                     case '3': // vote for player
                         Cache::put("ussd_session_state_{$sessionId}", 'vote_for_player');
                         $sms = "CON Enter the player code:";
+                        return response($sms);
+                    case '4':
+                        Cache::forget("ussd_session_state_{$sessionId}");
+                        $wallet = $contact->player->player_code;
+                        $message = "Hi! I'm in the MAISHA KRISI PROMO, and your vote can help us win BIG! 🏆\n\n" .
+                        "👉 Dial *245#, select Option 3, and enter my code: $wallet.\n" .
+                        "OR\n" .
+                        "💵 Send KES $platform->wallet_price to Paybill: {$platform->paybill->shortcode}, Acc: $wallet.\n\n" .
+                        "Let’s do this together! Share with friends so we can win amazing prizes! 🎉💪";                        
+                        
+                        sendSMS($message, $mobile, 1);
+                        $sms = "END Your share message has been sent to you";
                         return response($sms);
 
                     default:
