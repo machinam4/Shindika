@@ -38,7 +38,7 @@ class Player extends Model
         $lastCode = self::orderBy('id', 'desc')->value('player_code');
         $nextCode = $lastCode ? strtoupper(self::incrementCode($lastCode)) : '0000';
 
-        return $nextCode;
+        return str_pad($nextCode, 4, '0', STR_PAD_LEFT);
     }
 
     public static function incrementCode($code)
